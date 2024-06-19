@@ -1,9 +1,10 @@
-// src/graphql/resolvers/userResolvers.ts
 import { IResolvers } from '@graphql-tools/utils';
 import { UserService } from '../../services/userService';
 import { UserRepository } from '../../repositories/UserRepository';
-import { AuthUtils } from '../../utils/authUtils';
+import { AuthUtils, withAuthAndOwnership } from '../../utils/authUtils';
 import prisma from '../../utils/prisma';
+import { UpdateUserArgs } from '../../types/Resolver';
+import { Context } from '../../types/middleware';
 
 const userRepository = new UserRepository(prisma);
 const authUtils = new AuthUtils();
@@ -67,9 +68,12 @@ export const userResolvers: IResolvers = {
      * @param password - New password of the user
      * @returns The updated user object
      */
-    updateUser: async (_, { id, name, email, password }) => {
-      return userService.updateUser(Number(id), name, email, password);
-    },
+    updateUser: withAuthAndOwnership<UpdateUserArgs, unknown>(
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      async (_, { id, name, email, password }, context: Context) => {
+        return userService.updateUser(Number(id), name, email, password);
+      },
+    ),
 
     /**
      * Delete a user by ID.
@@ -77,7 +81,15 @@ export const userResolvers: IResolvers = {
      * @param id - ID of the user to delete
      * @returns The deleted user object
      */
-    deleteUser: async (_, { id }) => {
+    deleteUser: async (_, { id }, context) => {
+      if (!context.userId) {
+        throw new Error('Not authenticated');
+      }
+
+      if (Number(id) !== context.userId) {
+        throw new Error('Not authorized to update this user');
+      }
+
       return userService.deleteUser(Number(id));
     },
   },
