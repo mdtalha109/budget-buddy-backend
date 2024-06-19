@@ -1,32 +1,14 @@
-// src/middleware/authMiddleware.ts
-
 import jwt from 'jsonwebtoken';
-import { PrismaClient } from '@prisma/client';
+import { config } from '../config';
+import { Context } from '../types/middleware';
 
-export interface Context {
-  req: {
-    headers: {
-      authorization?: string;
-    };
-  };
-  prisma: PrismaClient;
-  userId: number | null;
-}
-
-/**
- * Extract user ID from token.
- * @param token - JWT token
- * @returns User ID or null if verification fails
- */
-
-const getUserFromToken = (token: string) => {
+const getUserFromToken = (token: string): number | null => {
   try {
     if (token) {
-      const { userId } = jwt.verify(
-        token,
-        process.env.JWT_SECRET as string,
-      ) as { userId: number };
-      return userId;
+      const decoded = jwt.verify(token, config.jwtSecret as string) as {
+        userId: number;
+      };
+      return decoded.userId;
     }
     return null;
   } catch (err) {
@@ -34,20 +16,8 @@ const getUserFromToken = (token: string) => {
   }
 };
 
-/**
- * Context function to set up the context for each request.
- * @param req - Request object
- * @returns Context containing the user ID
- */
-
-export const context = ({
-  req,
-  prisma,
-}: {
-  req: Context['req'];
-  prisma: PrismaClient;
-}): Context => {
-  const token = req.headers.authorization || '';
-  const userId = getUserFromToken(token);
-  return { req, prisma, userId };
+export const context = ({ req }: { req: Context['req'] }): Context => {
+  const token = req.headers.authorization?.replace('Bearer ', '') || '';
+  const userId: number | null = getUserFromToken(token);
+  return { req, userId };
 };
