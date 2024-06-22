@@ -31,4 +31,6 @@ model expenses {
   amount      Float
   userId      Int
   user        users     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
