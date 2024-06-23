@@ -8,7 +8,7 @@ export class ExpenseRepository implements IExpenseRepository {
         this.prisma = prisma;
     }
 
-    async createExpense(userId: number, description: string, amount: number, date: string, category: string): Promise<Expense> {
+    async createExpense(userId: number, description: string, amount: number, date: Date, category: string): Promise<Expense> {
         return this.prisma.expenses.create({
             data: {
                 userId,
@@ -20,7 +20,7 @@ export class ExpenseRepository implements IExpenseRepository {
         });
     }
 
-    async updateExpense(id: number, userId: number, description?: string, amount?: number, date?: string, category?: string): Promise<Expense> {
+    async updateExpense(id: number, userId: number, description?: string, amount?: number, date?: Date, category?: string): Promise<Expense> {
         return this.prisma.expenses.update({
             where: { id: id, userId: userId },
             data: {

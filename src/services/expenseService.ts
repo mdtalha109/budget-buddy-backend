@@ -16,11 +16,11 @@ export class ExpenseService {
         this.expenseRepository = expenseRepository;
     }
 
-    async addExpense(userId: number, description: string, amount: number, date: string, category?: string): Promise<Expense> {
+    async addExpense(userId: number, description: string, amount: number, date: Date, category?: string): Promise<Expense> {
         return this.expenseRepository.createExpense(userId, description, amount, date, category);
     }
 
-    async updateExpense(userId: number, id: number, description?: string, amount?: number, date?: string, category?: string): Promise<Expense> {
+    async updateExpense(userId: number, id: number, description?: string, amount?: number, date?: Date, category?: string): Promise<Expense> {
         return this.expenseRepository.updateExpense(id, userId, description, amount, date, category);
     }
 
