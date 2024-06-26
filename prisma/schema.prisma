@@ -31,6 +31,7 @@ model expenses {
   amount      Float
   userId      Int
   user        users     @relation(fields: [userId], references: [id])
+  recurringMetadata Json?   @default("{}")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
