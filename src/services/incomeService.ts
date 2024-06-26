@@ -17,24 +17,58 @@ export class IncomeService {
     this.incomeRepository = incomeRepository;
   }
 
-  async addIncome(userId: number, description: string, amount: number, date: Date, category?: string): Promise<Income> {
-    const { error } = incomeSchema.validate({ description, amount, date, category });
+  async addIncome(
+    userId: number,
+    description: string,
+    amount: number,
+    date: Date,
+    category?: string,
+  ): Promise<Income> {
+    const { error } = incomeSchema.validate({
+      description,
+      amount,
+      date,
+      category,
+    });
     if (error) {
       logger.error(`Validation failed: ${error.message}`);
       throw new ValidationError(`Validation failed: ${error.message}`);
     }
-    const income = await this.incomeRepository.createIncome(userId, description, amount, date, category);
+    const income = await this.incomeRepository.createIncome(
+      userId,
+      description,
+      amount,
+      date,
+      category,
+    );
     logger.info(`Income added: ${income.id}`);
     return income;
   }
 
-  async updateIncome(userId: number, id: number, description?: string, amount?: number, date?: Date, category?: string): Promise<Income> {
-    const { error } = incomeSchema.validate({ description, amount, date, category }, { allowUnknown: true });
+  async updateIncome(
+    userId: number,
+    id: number,
+    description?: string,
+    amount?: number,
+    date?: Date,
+    category?: string,
+  ): Promise<Income> {
+    const { error } = incomeSchema.validate(
+      { description, amount, date, category },
+      { allowUnknown: true },
+    );
     if (error) {
       logger.error(`Validation failed: ${error.message}`);
       throw new ValidationError(`Validation failed: ${error.message}`);
     }
-    const income = await this.incomeRepository.updateIncome(id, userId, description, amount, date, category);
+    const income = await this.incomeRepository.updateIncome(
+      id,
+      userId,
+      description,
+      amount,
+      date,
+      category,
+    );
     logger.info(`Income updated: ${income.id}`);
     return income;
   }
