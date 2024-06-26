@@ -21,6 +21,7 @@ model users {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   expenses expenses[]
+  incomes incomes[]
 }
 
 model expenses {
@@ -34,4 +35,17 @@ model expenses {
   recurringMetadata Json?   @default("{}")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+
+model incomes {
+  id                Int      @id @default(autoincrement())
+  description       String
+  amount            Float
+  date              DateTime
+  category          String?
+  userId            Int
+  user              users     @relation(fields: [userId], references: [id])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
