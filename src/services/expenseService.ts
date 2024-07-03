@@ -60,8 +60,8 @@ export class ExpenseService {
     return this.expenseRepository.deleteExpense(id, userId);
   }
 
-  async getExpenses(userId: number): Promise<Expense[] | null> {
-    return this.expenseRepository.getExpenses(userId);
+  async getExpenses(userId: number, startDate: string, endDate: string): Promise<Expense[] | null> {
+    return this.expenseRepository.getExpenses(userId, startDate, endDate);
   }
 
   async getExpenseById(userId: number, id: number): Promise<Expense | null> {

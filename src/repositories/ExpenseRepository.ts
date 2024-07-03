@@ -57,9 +57,15 @@ export class ExpenseRepository implements IExpenseRepository {
     });
   }
 
-  async getExpenses(userId: number): Promise<Expense[]> {
+  async getExpenses(userId: number, startDate:string, endDate:string): Promise<Expense[]> {
     return this.prisma.expenses.findMany({
-      where: { userId },
+      where: { 
+        userId: userId,
+        createdAt: {
+          gte: new Date(startDate),
+          lte: new Date(endDate),
+        },
+       },
     });
   }
 
