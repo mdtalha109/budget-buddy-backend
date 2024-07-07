@@ -21,8 +21,11 @@ const expenseRepository = new ExpenseRepository(prisma);
 
 describe('ExpenseRepository', () => {
   const userId = 1;
+  const startDate = "2024-07-01";
+  const endDate = "2024-07-31";
   const mockExpense: Expense = {
     id: 1,
+
     description: 'Test Expense',
     amount: 50.0,
     date: new Date('2023-06-22'),
@@ -31,13 +34,7 @@ describe('ExpenseRepository', () => {
     createdAt: new Date(),
     updatedAt: new Date(),
     recurringMetadata: {
-      frequency: 'monthly',
-      interval: 1,
-      endDate: new Date('2023-12-22').toISOString(),
-      occurrences: 6,
-      currentOccurrence: 1,
-      nextOccurrence: new Date('2023-07-22').toISOString(),
-      paused: false,
+
     },
   };
 
@@ -113,22 +110,18 @@ describe('ExpenseRepository', () => {
   it('should retrieve all expenses for a user', async () => {
     prisma.expenses.findMany = jest.fn().mockResolvedValue([mockExpense]);
 
-    const result = await expenseRepository.getExpenses(userId);
+    const result = await expenseRepository.getExpenses(userId, startDate, endDate);
 
     expect(prisma.expenses.findMany).toHaveBeenCalledWith({
-      where: { userId },
+      where: {
+        userId,
+        createdAt: {
+          gte: new Date(startDate),
+          lte: new Date(endDate),
+        },
+      },
     });
     expect(result).toEqual([mockExpense]);
   });
 
-  it('should retrieve all expenses', async () => {
-    prisma.expenses.findMany = jest.fn().mockResolvedValue([mockExpense]);
-
-    const result = await expenseRepository.getExpenses(userId);
-
-    expect(prisma.expenses.findMany).toHaveBeenCalledWith({
-      where: { userId },
-    });
-    expect(result).toEqual([mockExpense]);
-  });
 });
