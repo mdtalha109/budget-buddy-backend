@@ -2,7 +2,7 @@ import { expenses as Expense } from '@prisma/client';
 import { JsonValue } from '@prisma/client/runtime/library';
 
 export interface IExpenseRepository {
-  getExpenses(userId: number): Promise<Expense[] | null>;
+  getExpenses(userId: number, startDate:string, endDate:string): Promise<Expense[] | null>;
   getExpenseById(id: number, userId: number): Promise<Expense | null>;
   createExpense(
     userId: number,
