@@ -34,6 +34,8 @@ export class IncomeService {
       logger.error(`Validation failed: ${error.message}`);
       throw new ValidationError(`Validation failed: ${error.message}`);
     }
+
+    console.log("here")
     const income = await this.incomeRepository.createIncome(
       userId,
       description,
@@ -73,8 +75,8 @@ export class IncomeService {
     return income;
   }
 
-  async getIncomes(userId: number): Promise<Income[]> {
-    return this.incomeRepository.getIncomes(userId);
+  async getIncomes(userId: number, startDate: string, endDate: string): Promise<Income[]> {
+    return this.incomeRepository.getIncomes(userId, startDate, endDate);
   }
 
   async getIncomeById(userId: number, id: number): Promise<Income | null> {

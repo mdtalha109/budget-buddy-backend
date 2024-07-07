@@ -47,9 +47,15 @@ export class IncomeRepository implements IincomeRepository {
     });
   }
 
-  async getIncomes(userId: number): Promise<Income[]> {
+  async getIncomes(userId: number, startDate:string, endDate:string): Promise<Income[]> {
     return this.prisma.incomes.findMany({
-      where: { userId },
+      where: { 
+        userId: userId,
+        createdAt: {
+          gte: new Date(startDate),
+          lte: new Date(endDate),
+        },
+       },
     });
   }
 

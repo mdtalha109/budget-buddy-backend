@@ -12,19 +12,32 @@ type Income {
   userId: ID!
 }
 
+type getIncomesApiResponse {
+  success: Boolean!
+  data: [Income]!
+  message: String!
+}
+
+type ApiResponse {
+  success: Boolean!
+  data: Expense
+  message: String!
+}
+
 
 type Query {
-  getIncomes: [Income!]!
-  getIncomeById(id: ID!): Income
+  getIncomes(startDate: String!, endDate: String!): getIncomesApiResponse!
+  getIncomeById(id: ID!): Income,
+  totalIncomes(startDate: String!, endDate: String!): Float!
 }
 
 type Mutation {
   addIncome(
     description: String!,
     amount: Float!,
-    date: Date!,
+    date: String!,
     category: String
-  ): Income!
+  ): ApiResponse!
 
   updateIncome(
     id: ID!,

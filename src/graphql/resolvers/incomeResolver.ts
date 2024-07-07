@@ -5,15 +5,17 @@ import prisma from '../../utils/prisma';
 import { Context } from '../../types/middleware';
 import { BaseError } from '../../errors/BaseError';
 import { IncomeRepository } from '../../repositories/incomeRepository';
+import { createResponse } from '../../utils/createResponse';
 
 const incomeRepository = new IncomeRepository(prisma);
 const incomeService = new IncomeService({ incomeRepository });
 
 const incomeResolvers: IResolvers = {
   Query: {
-    getIncomes: withAuth(async (_, __, context: Context) => {
+    getIncomes: withAuth(async (_, { startDate, endDate }, context: Context) => {
       try {
-        return await incomeService.getIncomes(context.userId!);
+        let incomes = await incomeService.getIncomes(context.userId!, startDate, endDate);
+        return createResponse(true, incomes, 'Expense fetched successfully')
       } catch (error) {
         handleError(error);
       }
@@ -26,18 +28,42 @@ const incomeResolvers: IResolvers = {
         handleError(error);
       }
     }),
+
+    totalIncomes: withAuth(async (_, { startDate, endDate }: { startDate: string; endDate: string }, context: Context) => {
+      try {
+        const total = await prisma.incomes.aggregate({
+          _sum: {
+            amount: true,
+          },
+          where: {
+            userId: context.userId,
+            createdAt: {
+              gte: new Date(startDate),
+              lte: new Date(endDate),
+            },
+
+          },
+        });
+        return total._sum.amount || 0.00;
+      } catch (error) {
+        handleError(error);
+      }
+    }),
   },
   Mutation: {
     addIncome: withAuth(
       async (_, { description, amount, date, category }, context: Context) => {
         try {
-          return await incomeService.addIncome(
+          const newIncomes = await incomeService.addIncome(
             context.userId!,
             description,
             amount,
             new Date(date),
             category,
           );
+
+          return createResponse(true, newIncomes, 'Income created successfully')
+
         } catch (error) {
           handleError(error);
         }

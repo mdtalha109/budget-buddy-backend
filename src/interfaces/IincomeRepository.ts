@@ -18,7 +18,7 @@ export interface IincomeRepository {
     category?: string,
   ): Promise<Income | null>;
 
-  getIncomes(userId: number): Promise<Income[] | null>;
+  getIncomes(userId: number, startDate:string, endDate:string): Promise<Income[] | null>;
 
   getIncomeById(id: number, userId: number): Promise<Income>;
 
