@@ -95,4 +95,22 @@ export class ExpenseRepository implements IExpenseRepository {
       );
     });
   }
+
+  async getTotalExpenses(userId: number, startDate:string, endDate:string): Promise<Number>{
+    let total = await this.prisma.expenses.aggregate({
+      _sum: {
+        amount: true,
+      },
+      where: {
+        userId: userId,
+        createdAt: {
+          gte: new Date(startDate),
+          lte: new Date(endDate),
+        },
+
+      },
+    });
+
+    return total._sum.amount || 0.00
+  }
 }

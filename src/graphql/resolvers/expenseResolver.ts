@@ -6,22 +6,33 @@ import prisma from '../../utils/prisma';
 import { Context } from '../../types/middleware';
 import { BaseError } from '../../errors/BaseError';
 import { RecurringMetadata } from '../../types/expense';
+import { createResponse } from '../../utils/createResponse';
 
 const expenseRepository = new ExpenseRepository(prisma);
 const expenseService = new ExpenseService({ expenseRepository });
 
 const expenseResolvers: IResolvers = {
   Query: {
-    getExpenses: withAuth(async (_, __, context: Context) => {
+    getExpenses: withAuth(async (_, { startDate, endDate }, context: Context) => {
       try {
-        return await expenseService.getExpenses(context.userId!);
+        let expenses = await expenseService.getExpenses(context.userId!, startDate, endDate);
+        return createResponse(true, expenses, 'Expense fetched successfully')
       } catch (error) {
         handleError(error);
       }
     }),
     getExpenseById: withAuth(async (_, { id }, context: Context) => {
       try {
-        return await expenseService.getExpenseById(context.userId!, Number(id));
+        let expense = await expenseService.getExpenseById(context.userId!, Number(id));
+        return createResponse(true, expense, 'Expense fetched successfully')
+      } catch (error) {
+        handleError(error);
+      }
+    }),
+    totalExpenses: withAuth(async (_, { startDate, endDate }: { startDate: string; endDate: string }, context: Context) => {
+      try {
+        let total_expense = await expenseService.getTotalExpense(context.userId!, startDate, endDate)
+        return createResponse(true, total_expense, 'Expense fetched successfully') 
       } catch (error) {
         handleError(error);
       }
@@ -46,6 +57,7 @@ const expenseResolvers: IResolvers = {
         context: Context,
       ) => {
         try {
+
           const recurringMetadata = {
             frequency,
             interval,
@@ -56,7 +68,8 @@ const expenseResolvers: IResolvers = {
               : undefined,
             paused,
           };
-          return await expenseService.addExpense(
+
+          const newExpense = await expenseService.addExpense(
             context.userId!,
             description,
             amount,
@@ -64,6 +77,8 @@ const expenseResolvers: IResolvers = {
             category,
             recurringMetadata,
           );
+
+          return createResponse(true, newExpense, 'Expense created successfully')
         } catch (error) {
           handleError(error);
         }
@@ -98,7 +113,7 @@ const expenseResolvers: IResolvers = {
               : undefined,
             paused,
           };
-          return await expenseService.updateExpense(
+          let expense = await expenseService.updateExpense(
             context.userId!,
             Number(id),
             description,
@@ -107,6 +122,8 @@ const expenseResolvers: IResolvers = {
             category,
             recurringMetadata,
           );
+
+          return createResponse(true, expense, 'Expense updated successfully')
         } catch (error) {
           handleError(error);
         }
@@ -114,7 +131,8 @@ const expenseResolvers: IResolvers = {
     ),
     deleteExpense: withAuth(async (_, { id }, context: Context) => {
       try {
-        return await expenseService.deleteExpense(context.userId!, Number(id));
+        let deletedExpense = await expenseService.deleteExpense(context.userId!, Number(id));
+        return createResponse(true, deletedExpense, 'Expense deleted successfully')
       } catch (error) {
         handleError(error);
       }

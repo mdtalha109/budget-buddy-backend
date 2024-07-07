@@ -23,4 +23,5 @@ export interface IExpenseRepository {
   ): Promise<Expense>;
   deleteExpense(id: number, userId: number): Promise<Expense>;
   getRecurringExpenses(): Promise<Expense[]>;
+  getTotalExpenses(userId: number, startDate:string, endDate:string): Promise<Number>
 }

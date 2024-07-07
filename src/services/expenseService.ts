@@ -71,4 +71,8 @@ export class ExpenseService {
   async getRecurringExpenses(): Promise<Expense[]> {
     return this.expenseRepository.getRecurringExpenses();
   }
+
+  async getTotalExpense(userId: number, startDate: string, endDate: string): Promise<Number>{
+    return this.expenseRepository.getTotalExpenses(userId, startDate, endDate)
+  }
 }

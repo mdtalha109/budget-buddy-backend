@@ -34,10 +34,16 @@ type getExpensesApiResponse {
   message: String!
 }
 
+type getTotalExpensesApiResponse {
+  success: Boolean!
+  data: Int!
+  message: String!
+}
+
 extend type Query {
   getExpenses(startDate: String!, endDate: String!): getExpensesApiResponse!
   getExpenseById(id: ID!): Expense
-  totalExpenses(startDate: String!, endDate: String!): Float!
+  totalExpenses(startDate: String!, endDate: String!): getTotalExpensesApiResponse! 
 }
 
 
