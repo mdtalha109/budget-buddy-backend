@@ -65,7 +65,12 @@ export class ExpenseRepository implements IExpenseRepository {
           gte: new Date(startDate),
           lte: new Date(endDate),
         },
-       },
+      },
+      orderBy: [
+        {
+          createdAt: 'desc',
+        },
+      ]
     });
   }
 

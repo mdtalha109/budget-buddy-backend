@@ -56,6 +56,11 @@ export class IncomeRepository implements IincomeRepository {
           lte: new Date(endDate),
         },
        },
+       orderBy: [
+        {
+          createdAt: 'desc',
+        },
+       ]
     });
   }
 
