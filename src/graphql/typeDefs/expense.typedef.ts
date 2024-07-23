@@ -6,7 +6,7 @@ type Expense {
   id: ID
   description: String
   amount: Float
-  date: String
+  date: Date!
   category: String
   userId: ID
 }
