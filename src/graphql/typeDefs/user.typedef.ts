@@ -1,3 +1,4 @@
+
 export const userTypeDef = `#graphql
 type User {
     id: ID!
@@ -5,6 +6,8 @@ type User {
     email: String!
     password: String!
   }
+
+
 
   type AuthPayload {
     token: String!
@@ -16,11 +19,24 @@ type User {
     me: User
   }
 
+  type UpdatedUser {
+    success: Boolean!
+    data: User
+    message: String!
+  }
+
+  type ApiUpdatePasswordResponse {
+    success: Boolean!
+    data: User
+    message: String!
+  }
+
   type Mutation {
     register(name: String!, email: String!, password: String!): AuthPayload!
     login(email: String!, password: String!): AuthPayload!
-    updateUser(id: ID!, name: String, email: String, password: String): User!
+    updateUser(id: ID!, name: String, email: String, password: String): UpdatedUser!
     deleteUser(id: ID!): User!
+    updatePassword(currentPassword: String, newPassword: String): ApiUpdatePasswordResponse!
   }
 
 `;

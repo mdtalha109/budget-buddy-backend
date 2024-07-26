@@ -1,6 +1,7 @@
 import { IUserRepository } from '../interfaces/IUserRepository';
 import { IAuthUtils } from '../interfaces/IAuthUtils';
 import { users as User } from '@prisma/client';
+import { ValidationError } from '../errors/ValidationError';
 
 interface UserServiceDependencies {
   userRepository: IUserRepository;
@@ -114,4 +115,29 @@ export class UserService {
   async deleteUser(id: number): Promise<User> {
     return this.userRepository.deleteUser(id);
   }
+
+
+  /**
+   * Update user's password.
+   * @param id - ID of the user
+   * @param currentPassword - old password of the user
+   * @param newPassword - New password of the user
+   * @returns The updated user object
+   */
+  async updatePassword(id: number, currentPassword: string, newPassword: string): Promise<User> {
+    const user = await this.userRepository.findUserById(id);
+    if (!user) {
+      throw new Error('No user found with this email');
+    }
+    const valid = await this.authUtils.comparePasswords(
+      currentPassword,
+      user.password,
+    );
+    if (!valid) {
+      throw new ValidationError('Current Password is not correct');
+    }
+    const hashedPassword = await this.authUtils.hashPassword(newPassword);
+    return this.userRepository.updatePassword(id, hashedPassword);
+  }
+  
 }

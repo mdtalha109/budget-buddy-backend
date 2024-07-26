@@ -1,10 +1,13 @@
 import { IResolvers } from '@graphql-tools/utils';
 import { UserService } from '../../services/userService';
 import { UserRepository } from '../../repositories/UserRepository';
-import { AuthUtils, withAuthAndOwnership } from '../../utils/authUtils';
+import { AuthUtils, withAuth, withAuthAndOwnership } from '../../utils/authUtils';
 import prisma from '../../utils/prisma';
 import { UpdateUserArgs } from '../../types/Resolver';
 import { Context } from '../../types/middleware';
+import { createResponse } from '../../utils/createResponse';
+import logger from '../../utils/logger';
+import { BaseError } from '../../errors/BaseError';
 
 const userRepository = new UserRepository(prisma);
 const authUtils = new AuthUtils();
@@ -70,8 +73,10 @@ export const userResolvers: IResolvers = {
      */
     updateUser: withAuthAndOwnership<UpdateUserArgs, unknown>(
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      async (_, { id, name, email, password }, context: Context) => {
-        return userService.updateUser(Number(id), name, email, password);
+      async (_, {  name, email, password }, context: Context) => {
+        let updatedUser = userService.updateUser(context.userId, name, email, password);
+        return createResponse(true, updatedUser, 'User Updated successfully')
+        
       },
     ),
 
@@ -92,5 +97,31 @@ export const userResolvers: IResolvers = {
 
       return userService.deleteUser(Number(id));
     },
+
+    /**
+     * update user's password by ID.
+     * @param _ - parent resolver
+     * @param id - ID of the user to update password
+     * @param currentPassword - current password of the user
+     * @param newPassword - new password of the user
+     * @returns The updated user object
+     */
+
+    updatePassword: withAuth(async (_, {currentPassword, newPassword}, context) => {
+      try {
+        let updatedUserPassword = await userService.updatePassword(context.userId, currentPassword, newPassword);
+        return createResponse(true, updatedUserPassword, 'Password updated successfully!')
+      } catch (error) {
+        handleError(error)
+      }
+    })
   },
 };
+
+function handleError(error: any) {
+  if (error instanceof BaseError) {
+    throw new Error(error.message);
+  } else {
+    throw new Error(error.message);
+  }
+}
